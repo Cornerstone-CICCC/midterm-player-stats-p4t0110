@@ -1,0 +1,36 @@
+{
+  "name": "midterm-player-stats-p4t0110",
+  "version": "1.0.0",
+  "description": "Build a full-stack app that imports a real dataset into PostgreSQL and lets a\r user **browse, search, and manage** it. Individual work.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev:backend": "nodemon backend/server.js",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cornerstone-CICCC/midterm-player-stats-p4t0110.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Cornerstone-CICCC/midterm-player-stats-p4t0110/issues"
+  },
+  "homepage": "https://github.com/Cornerstone-CICCC/midterm-player-stats-p4t0110#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "pg": "^8.22.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}

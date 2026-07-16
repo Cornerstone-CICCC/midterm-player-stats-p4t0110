@@ -1,0 +1,195 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+// Get performances from backend
+const API_URL = 'http://localhost:3001/api';
+const page = 1;
+const limit = 10;
+
+let performances = [];
+let total = 0;
+let totalPages = 0;
+let error = '';
+
+try {
+  const response = await fetch(`${API_URL}/performances?page=${page}&limit=${limit}`);
+  if (response.ok) {
+    const data = await response.json();
+    performances = data.data;
+    total = data.total;
+    totalPages = data.totalPages;
+  } else {
+    error = 'Error fetching performances';
+  }
+} catch (e) {
+  error = 'Backend not available';
+}
+---
+
+<BaseLayout title="Player Performances">
+  <main>
+    <div class="container">
+      <h1>🏆 Performances del Torneo</h1>
+      
+      {error && (
+        <div class="error-box">
+          <p>⚠️ {error}</p>
+          <p>Asegúrate de que el backend esté corriendo en http://localhost:3001</p>
+        </div>
+      )}
+
+      {!error && (
+        <>
+          <div class="controls">
+            <div class="pagination-info">
+              <p>Showing {performances.length} of {total} performances</p>
+            </div>
+            <button class="btn btn-primary">➕ Add Performance</button>
+          </div>
+
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Jugador</th>
+                <th>Posición</th>
+                <th>Fecha</th>
+                <th>Partido</th>
+                <th>Goles</th>
+                <th>Asistencias</th>
+                <th>Minutos</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              {performances.length > 0 ? (
+                performances.map((perf: any) => (
+                  <tr>
+                    <td>{perf.player_name}</td>
+                    <td>{perf.position}</td>
+                    <td>{new Date(perf.match_date).toLocaleDateString()}</td>
+                    <td>{perf.opponent_team} ({perf.match_result})</td>
+                    <td>{perf.goals}</td>
+                    <td>{perf.assists}</td>
+                    <td>{perf.minutes_played}</td>
+                    <td>
+                      <a href={`/performances/${perf.id}`} class="btn btn-small">Ver</a>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colspan="8" class="text-center">No performances found</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+
+          <div class="pagination">
+            <button disabled={page === 1} class="btn">← Anterior</button>
+            <span>Página {page} of {totalPages}</span>
+            <button disabled={page === totalPages} class="btn">Siguiente →</button>
+          </div>
+        </>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  h1 {
+    color: #333;
+    margin-bottom: 2rem;
+  }
+
+  .error-box {
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: #c33;
+  }
+
+  .controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .table th {
+    background-color: #f5f5f5;
+    font-weight: bold;
+  }
+
+  .table tr:hover {
+    background-color: #f9f9f9;
+  }
+
+  .btn {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+  }
+
+  .btn:hover {
+    background-color: #0056b3;
+  }
+
+  .btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+
+  .btn-primary {
+    background-color: #28a745;
+  }
+
+  .btn-primary:hover {
+    background-color: #218838;
+  }
+
+  .btn-small {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .pagination-info {
+    color: #666;
+    font-size: 0.9rem;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+</style>

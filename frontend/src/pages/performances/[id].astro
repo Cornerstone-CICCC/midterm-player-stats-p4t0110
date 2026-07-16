@@ -1,0 +1,224 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  return [];
+}
+
+const { id } = Astro.params;
+const API_URL = 'http://localhost:3001/api';
+let performance = null;
+let error = '';
+
+try {
+  const response = await fetch(`${API_URL}/performances/${id}`);
+  if (response.ok) {
+    performance = await response.json();
+  } else if (response.status === 404) {
+    error = 'Performance not found';
+  } else {
+    error = 'Error fetching performance';
+  }
+} catch (e) {
+  error = 'Backend not available';
+}
+---
+
+<BaseLayout title={performance ? `${performance.player_name}` : 'Performance Detail'}>
+  <main>
+    <div class="container">
+      <a href="/" class="back-link">← Volver a la lista</a>
+
+      {error && (
+        <div class="error-box">
+          <p>⚠️ {error}</p>
+        </div>
+      )}
+
+      {performance && (
+        <div class="detail-card">
+          <div class="header">
+            <h1>{performance.player_name}</h1>
+            <span class="badge">{performance.position}</span>
+          </div>
+
+          <div class="grid">
+            <div class="section">
+              <h2>📋 Información del Jugador</h2>
+              <dl>
+                <dt>ID:</dt>
+                <dd>{performance.player_id}</dd>
+              </dl>
+            </div>
+
+            <div class="section">
+              <h2>⚽ Información del Partido</h2>
+              <dl>
+                <dt>Fecha:</dt>
+                <dd>{new Date(performance.match_date).toLocaleDateString('es-ES')}</dd>
+                <dt>Rival:</dt>
+                <dd>{performance.opponent_team}</dd>
+                <dt>Resultado:</dt>
+                <dd>{performance.match_result}</dd>
+                <dt>Estadio:</dt>
+                <dd>{performance.stadium}</dd>
+                <dt>Ciudad:</dt>
+                <dd>{performance.city}</dd>
+                <dt>Fase:</dt>
+                <dd>{performance.tournament_stage}</dd>
+              </dl>
+            </div>
+
+            <div class="section">
+              <h2>📊 Estadísticas</h2>
+              <dl>
+                <dt>Goles:</dt>
+                <dd class="stat-value">{performance.goals}</dd>
+                <dt>Asistencias:</dt>
+                <dd class="stat-value">{performance.assists}</dd>
+                <dt>Minutos Jugados:</dt>
+                <dd>{performance.minutes_played}'</dd>
+              </dl>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn btn-primary">✏️ Editar</button>
+            <button class="btn btn-danger">🗑️ Eliminar</button>
+          </div>
+        </div>
+      )}
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .back-link {
+    display: inline-block;
+    margin-bottom: 2rem;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .error-box {
+    background: #fee;
+    border: 1px solid #fcc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    color: #c33;
+  }
+
+  .detail-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 2rem;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .header h1 {
+    margin: 0;
+    font-size: 2rem;
+    color: #333;
+  }
+
+  .badge {
+    background: #007bff;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+
+  .section h2 {
+    color: #007bff;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.5rem 1rem;
+  }
+
+  dt {
+    font-weight: bold;
+    color: #555;
+  }
+
+  dd {
+    color: #333;
+    margin: 0;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #28a745;
+  }
+
+  .actions {
+    display: flex;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .btn {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .btn-primary {
+    background: #007bff;
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #0056b3;
+  }
+
+  .btn-danger {
+    background: #dc3545;
+    color: white;
+  }
+
+  .btn-danger:hover {
+    background: #c82333;
+  }
+</style>

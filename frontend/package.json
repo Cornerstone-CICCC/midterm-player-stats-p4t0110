@@ -1,0 +1,14 @@
+{
+  "name": "player-performance-frontend",
+  "version": "1.0.0",
+  "description": "Frontend for Player Performance Explorer",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "devDependencies": {
+    "astro": "^4.0.0"
+  }
+}
