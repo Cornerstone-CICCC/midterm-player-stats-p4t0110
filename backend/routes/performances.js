@@ -105,7 +105,7 @@ router.put('/:id', async (req, res) => {
     const result = await pool.query(`
       UPDATE performances
       SET goals = $1, assists = $2, minutes_played = $3
-      WHERE performance_id = $4
+      WHERE id = $4
       RETURNING *
     `, [goals, assists, minutes_played, id]);
 
@@ -127,7 +127,7 @@ router.delete('/:id', async (req, res) => {
 
     const result = await pool.query(`
       DELETE FROM performances
-      WHERE performance_id = $1
+      WHERE id = $1
       RETURNING *
     `, [id]);
 
@@ -139,6 +139,29 @@ router.delete('/:id', async (req, res) => {
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Error deleting performance' });
+  }
+});
+
+// GET rankings with aggregate query
+router.get('/rankings', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT 
+        pl.player_name,
+        SUM(p.goals) AS total_goals,
+        SUM(p.assists) AS total_assists,
+        COUNT(*) AS appearances
+      FROM performances p
+      JOIN players pl ON p.player_id = pl.player_id
+      GROUP BY pl.player_name
+      ORDER BY total_goals DESC, total_assists DESC
+      LIMIT 10
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error fetching rankings' });
   }
 });
 
